@@ -177,10 +177,10 @@ For each byte the corresponding source byte is used as an index of the destinati
 
 ```
 for(int i = 0; i < 16; i++) {
-if(src[i] & 0x80)
-    dst[i] = 0;
-else
-    dst[i] = dst[src[i]]
+    if(src[i] & 0x80)
+        dst[i] = 0;
+    else
+        dst[i] = dst[src[i]]
 }
 ```
 Here’s a simple assembly example:
