@@ -122,12 +122,12 @@ INIT_XMM sse2
 cglobal simple_loop, 1, 2, 2, src
      movq r1q, 3
 .loop:
-   	movu m0, [srcq]
+     movu m0, [srcq]
      movu m1, [srcq+2*r1q+3+mmsize]
 
      ; do some things
 
-	add srcq, mmsize
+     add srcq, mmsize
 dec r1q
 jg .loop
 
