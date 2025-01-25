@@ -129,7 +129,7 @@ This means its source (right hand side) can be an xmm register or a memory addre
 
 The officedaytime.com website above has a good diagram showing what’s going on:
 
-![][image1]
+![What is this](image1.png)
 
 You can see that bytes are interleaved from the lower half of each register respectively. But what has this got to do with range extension? If the src register is all zeros this interleaves the bytes in dst with zeros. This is what is known as *zero extension* as the bytes are unsigned. punpckhbw can be used to do the same thing for the high bytes.
 
