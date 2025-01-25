@@ -86,6 +86,7 @@ constants_2: times 2 dw 4,3,2,1
 These labels, which the assembler converts to a memory address, can then be used in loads (but not stores as they are read-only). Some instructions take a memory address as an operand so they can be used without explicit loads into a register (there are pros and cons to this).
 
 **Offsets**
+
 Offsets are the distance (in bytes) between consecutive elements in memory. The offset is determined by the **size of each element** in the data structure.
 
 Now that we're able to write loops, it’s time to fetch data. But there are some differences compared to C. Let’s look at the following loop in C:
