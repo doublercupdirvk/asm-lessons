@@ -175,28 +175,34 @@ movu is shorthand for movdqu (move double quad unaligned). Alignment will be cov
 
 Note that we don’t refer to vector registers by their full name, in this case xmm0,but as m0, an abstracted form. In future lessons you’ll see how this means you can write code once and have it work on multiple SIMD register sizes.
 
+```
 paddb m0, m1
+```
 
 paddb (read this in your head as *p-add-b*) is adding each byte in each register as shown below. The “p” prefix stands for “packed” and is used to identify vector instructions vs scalar instructions. The “b” suffix shows that this is bytewise addition (addition of bytes).
 
 | a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-+
+\+
 
 | q | r | s | t | u | v | w | x | y | z | aa | ab | ac | ad | ae | af |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-=
+\=
 
 | a+q | b+r | c+s | d+t | e+u | f+v | g+w | h+x | i+y | j+z | k+aa | l+ab | m+ac | n+ad | o+ae | p+af |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
+```
 movu  [srcq], m0
+```
 
 This is what’s known as a store. The data is written back to the address in the srcq pointer.
 
+```
 RET
+```
 
 This is a macro to denote the function returns. Virtually all assembly functions in FFmpeg modify the data in the arguments as opposed to returning a value.
 
