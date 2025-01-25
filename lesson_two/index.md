@@ -7,8 +7,8 @@ We need to first introduce the idea of labels and jumps. In the artificial examp
 ```
 mov  r0q, 3
 .loop:
-dec  r0q
-jmp .loop
+    dec  r0q
+    jmp .loop
 ```
 
 Before making a realistic loop we have to introduce the *FLAGS* register. We won’t dwell on the intricacies of *FLAGS* too much (again because GPR operations are largely scaffolding) but there are several flags such as Zero-Flag, Sign-Flag and Overflow-Flag which are set based on the output of most non-mov instructions on scalar data such as arithmetic operations and shifts.
@@ -18,9 +18,9 @@ Here’s an example where the loop counter counts down until zero and jg (jump i
 ```
 mov  r0q, 3
 .loop:
-     ; do something
-dec  r0q
-jg  .loop ; jump if greater than zero
+    ; do something
+    dec  r0q
+    jg  .loop ; jump if greater than zero
 ```
 
 This is equivalent to the following C code:
@@ -47,10 +47,10 @@ This is equivalent to:
 ```
 xor r0q, r0q
 .loop:
-inc r0q
-; do something
-cmp r0q, 3
-jl  .loop ; jump if (r0q - 3) < 0, i.e (r0q < 3)
+    inc r0q
+    ; do something
+    cmp r0q, 3
+    jl  .loop ; jump if (r0q - 3) < 0, i.e (r0q < 3)
 ```
 
 There are several things to point out in this snippet. First is xor r0q, r0q which is a common way of setting a register to zero, that on some systems is faster than mov r0q, 0, because, put simply, there is no actual load taking place. It can also be used on SIMD registers with pxor m0, m0 to zero out an entire register. The next thing to note is the use of cmp. cmp effectively subtracts the second register from the first (without storing the value anywhere) and sets *FLAGS*, but as per the comment, it can be read together with the jump, (jl = jump if less than zero) to jump if r0q < 3.
@@ -122,7 +122,7 @@ cglobal simple_loop, 1, 2, 2, src
      movq r1q, 3
 .loop:
    	movu m0, [srcq]
-movu m1, [srcq+2*r1q+3+mmsize]
+     movu m1, [srcq+2*r1q+3+mmsize]
 
      ; do some things
 
