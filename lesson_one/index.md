@@ -33,7 +33,7 @@ Lastly, you’ll see a lot of self-proclaimed experts online saying none of this
 **Flavours of assembly language**  
 These lessons will focus on x86 64-bit assembly language. This is also known as amd64, although it still works on Intel CPUs. There are other types of assembly for other CPUs like ARM and RISC-V and potentially in the future these lessons will be extended to cover those.
 
-There are two flavours of x86 assembly syntax that you’ll see online: AT\&T and Intel. AT\&T Syntax is older and harder to read compared to Intel syntax. So we will use Intel syntax.
+There are two flavours of x86 assembly syntax that you’ll see online: AT&T and Intel. AT&T Syntax is older and harder to read compared to Intel syntax. So we will use Intel syntax.
 
 **Supporting materials**  
 You might be surprised to hear that books or online resources like Stack Overflow are not particularly helpful as references. This is in part because of our choice to use handwritten assembly with Intel syntax. But also because a lot of online resources are focused on operating system programming or hardware programming, usually using non-SIMD code. FFmpeg assembly is particularly focused on high performance image processing, and as you’ll see it’s a particularly unique approach to assembly programming. That said, it’s easy to understand other assembly use-cases once you’ve completed these lessons
@@ -56,10 +56,10 @@ In most assembly books, there are whole chapters dedicated to the subtleties of 
 **Vector registers**  
 Vector (SIMD) registers, as the name suggests, contain multiple data elements. There are various types of vector registers:
 
-* mm registers \- MMX registers, 64-bit sized, historic and not used much any more  
-* xmm registers \- XMM registers, 128-bit sized, widely available  
-* ymm registers \- YMM registers, 256-bit sized, some complications when using these   
-* zmm registers \- ZMM registers, 512-bit sized, limited availability
+* mm registers - MMX registers, 64-bit sized, historic and not used much any more  
+* xmm registers - XMM registers, 128-bit sized, widely available  
+* ymm registers - YMM registers, 256-bit sized, some complications when using these   
+* zmm registers - ZMM registers, 512-bit sized, limited availability
 
 Most calculations in video compression and decompression are integer-based so we’ll stick to that. Here’s an example of 16 bytes in an xmm register:
 
@@ -84,11 +84,11 @@ Or two quadwords (64-bit integers):
 To recap:
 
 
-* **b**ytes \- 8-bit data  
-* **w**ords \- 16-bit data  
-* **d**oublewords \- 32-bit data  
-* **q**uadwords \- 64-bit data  
-* **d**ouble **q**uadwords \- 128-bit data
+* **b**ytes - 8-bit data  
+* **w**ords - 16-bit data  
+* **d**oublewords - 32-bit data  
+* **q**uadwords - 64-bit data  
+* **d**ouble **q**uadwords - 128-bit data
 
 The bold characters will be important later.
 
@@ -99,12 +99,14 @@ You’ll see in many examples we include the file x86inc.asm. X86inc.asm is a li
 
 Let’s look at a simple (and very much artificial) snippet of scalar asm (assembly code that operates on individual data items, one at a time, within each instruction) to see what’s going on:
 
+```
 mov  r0q, 3  
 inc  r0q  
 dec  r0q  
 imul r0q, 5
+```
 
-In the first line, the *immediate value* 3 (a value stored directly in the assembly code itself as opposed to a value fetched from memory) is being stored into register r0 as a quadword. Note that in Intel syntax, the source operand (the value or location providing the data, located on the right) is transferred to the destination operand (the location receiving the data, located on the left), much like the behavior of memcpy. You can also read it as “r0q \= 3”, since the order is the same. The “q” suffix of r0 designates the register as being used as a quadword. inc increments the value so that r0q contains 4, dec decrements the value back to 3\. imul multiplies the value by 5\. So at the end, r0q contains 15\. 
+In the first line, the *immediate value* 3 (a value stored directly in the assembly code itself as opposed to a value fetched from memory) is being stored into register r0 as a quadword. Note that in Intel syntax, the source operand (the value or location providing the data, located on the right) is transferred to the destination operand (the location receiving the data, located on the left), much like the behavior of memcpy. You can also read it as “r0q = 3”, since the order is the same. The “q” suffix of r0 designates the register as being used as a quadword. inc increments the value so that r0q contains 4, dec decrements the value back to 3. imul multiplies the value by 5. So at the end, r0q contains 15. 
 
 Note that the human readable instructions such as mov and inc, which are assembled into machine code by the assembler, are known as *mnemonics*. You may see online and in books mnemonics represented with capital letters like MOV and INC but these are the same as the lower case versions. In FFmpeg, we use lower case mnemonics and keep upper case reserved for macros.
 
@@ -112,40 +114,50 @@ Note that the human readable instructions such as mov and inc, which are assembl
 
 Here’s our first SIMD function:
 
+```
 %include "x86inc.asm"
 
 SECTION .text
 
-;static void add\_values(const uint8\_t \*src, const uint8\_t \*src2)  
-INIT\_XMM sse2  
-cglobal add\_values, 2, 2, 2, src, src2   
-    movu  m0, \[srcq\]  
-    movu  m1, \[src2q\]
+;static void add_values(const uint8_t *src, const uint8_t *src2)  
+INIT_XMM sse2  
+cglobal add_values, 2, 2, 2, src, src2   
+    movu  m0, [srcq]  
+    movu  m1, [src2q]
 
     paddb m0, m1
 
-    movu  \[srcq\], m0
+    movu  [srcq], m0
 
     RET
+```
 
 Let’s go through it line by line:
 
+```
 %include "x86inc.asm"
+```
 
 This is a “header” developed in the x264, FFmpeg, and dav1d communities to provide helpers, predefined names and macros (such as cglobal below) to simplify writing assembly.
 
+```
 SECTION .text
+```
 
 This denotes the section where the code you want to execute is placed. This is in contrast to the .data section, where you can put constant data.
 
-;static void add\_values(const uint8\_t \*src, const uint8\_t \*src2);  
-INIT\_XMM sse2
+```
+;static void add_values(const uint8_t *src, const uint8_t *src2);  
+INIT_XMM sse2
+```
 
 The first line is a comment (the semi-colon “;” in asm is like “//” in C) showing what the function argument looks like in C. The second line shows how we are initialising the function to use XMM registers, using the sse2 instruction set. This is because paddb is an sse2 instruction. We’ll cover sse2 in more detail in the next lesson.
 
-cglobal add\_values, 2, 2, 2, src, src2
+```
+cglobal add_values, 2, 2, 2, src, src2
+```
 
-This is an important line as it defines a C function called “add\_values”. 
+This is an important line as it defines a C function called “add_values”. 
 
 Let’s go through each item one at a time:
 
@@ -156,10 +168,10 @@ Let’s go through each item one at a time:
 
 It’s worth noting that older code may not have labels for the function arguments but instead address GPRs directly using r0, r1 etc.
 
-    movu  m0, \[srcq\]  
-    movu  m1, \[src2q\]
+    movu  m0, [srcq]  
+    movu  m1, [src2q]
 
-movu is shorthand for movdqu (move double quad unaligned). Alignment will be covered in another lesson but for now movu can be treated as a 128-bit move from \[srcq\]. In the case of mov, the brackets mean that the address in \[srcq\] is being dereferenced, the equivalent of \**src in C.* This is what’s known as a load. Note that the “q” suffix refers to the size of the pointer *(*i.e in C it represents *sizeof(*src) \== 8 on 64-bit systems, and x86asm is smart enough to use 32-bit on 32-bit systems) but the underlying load is 128-bit.
+movu is shorthand for movdqu (move double quad unaligned). Alignment will be covered in another lesson but for now movu can be treated as a 128-bit move from [srcq]. In the case of mov, the brackets mean that the address in [srcq] is being dereferenced, the equivalent of **src in C.* This is what’s known as a load. Note that the “q” suffix refers to the size of the pointer *(*i.e in C it represents *sizeof(*src) == 8 on 64-bit systems, and x86asm is smart enough to use 32-bit on 32-bit systems) but the underlying load is 128-bit.
 
 Note that we don’t refer to vector registers by their full name, in this case xmm0,but as m0, an abstracted form. In future lessons you’ll see how this means you can write code once and have it work on multiple SIMD register sizes.
 
@@ -170,17 +182,17 @@ paddb (read this in your head as *p-add-b*) is adding each byte in each register
 | a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-\+
++
 
 | q | r | s | t | u | v | w | x | y | z | aa | ab | ac | ad | ae | af |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-\=
+=
 
 | a+q | b+r | c+s | d+t | e+u | f+v | g+w | h+x | i+y | j+z | k+aa | l+ab | m+ac | n+ad | o+ae | p+af |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-movu  \[srcq\], m0
+movu  [srcq], m0
 
 This is what’s known as a store. The data is written back to the address in the srcq pointer.
 
