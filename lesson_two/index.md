@@ -43,7 +43,7 @@ for(i = 0; i < 3; i++) {
 }
 ```
 
-This is equivalent to:
+This is roughly equivalent to (there's no simple way of matching this ```for``` loop):
 
 ```assembly
 xor r0q, r0q
@@ -56,7 +56,7 @@ xor r0q, r0q
 
 There are several things to point out in this snippet. First is ```xor r0q, r0q``` which is a common way of setting a register to zero, that on some systems is faster than ```mov r0q, 0```, because, put simply, there is no actual load taking place. It can also be used on SIMD registers with ```pxor m0, m0``` to zero out an entire register. The next thing to note is the use of cmp. cmp effectively subtracts the second register from the first (without storing the value anywhere) and sets *FLAGS*, but as per the comment, it can be read together with the jump, (jl = jump if less than zero) to jump if ```r0q < 3```.
 
-Note how there is one extra instruction (cmp) in this snippet. Generally speaking, fewer instructions means faster code, which is why the earlier snippet is preferred. As you’ll see in future lessons, there are more tricks used to avoid this extra instruction and have *FLAGS* be set by arithmetic or another operation.
+Note how there is one extra instruction (cmp) in this snippet. Generally speaking, fewer instructions means faster code, which is why the earlier snippet is preferred. As you’ll see in future lessons, there are more tricks used to avoid this extra instruction and have *FLAGS* be set by arithmetic or another operation. Note how we are not writing assembly to match C loops exactly, we write loops to make them as fast as possible in assembly.
 
 Here are some common jump mnemonics you’ll end up using (*FLAGS* are there for completeness, but you don’t need to know the specifics to write loops):
 
