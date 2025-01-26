@@ -8,3 +8,6 @@ Welcome to the FFmpeg School of Assembly Language. You have taken the first step
 **Lessons**
 
 In this Git repository there are lessons and assignments (not uploaded yet) that correspond with each lessons. By the end of the lessons you'll be able to contribute to FFmpeg.
+
+A discord server is available to answer questions:
+https://discord.com/invite/Ks5MhUhqfB
