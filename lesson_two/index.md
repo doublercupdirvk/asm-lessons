@@ -27,10 +27,11 @@ This is equivalent to the following C code:
 
 ```c
 int i = 3;
-while(i > 0) {
-    // do something
-    i--;
-}
+do
+{
+   // do something
+   i--;
+} while(i > 0)
 ```
 
 This C code is a bit unnatural.  Usually a loop in C is written like this:
