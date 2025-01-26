@@ -4,7 +4,7 @@ Now that you’ve written your first assembly language function, we will now int
 
 We need to first introduce the idea of labels and jumps. In the artificial example below, the jmp instruction moves the code instruction to after “.loop:”. “.loop:” is known as a *label*, with the dot prefixing the label meaning it’s a *local label*, effectively allowing you to reuse the same label name across multiple functions. This example, of course, shows an infinite loop, but we’ll extend this later to something more realistic.
 
-```
+```assembly
 mov  r0q, 3
 .loop:
     dec  r0q
@@ -15,7 +15,7 @@ Before making a realistic loop we have to introduce the *FLAGS* register. We won
 
 Here’s an example where the loop counter counts down until zero and jg (jump if greater than zero) is the loop condition. dec r0q sets the FLAGs based on the value of r0q after the instruction and you can jump based on them.
 
-```
+```assembly
 mov  r0q, 3
 .loop:
     ; do something
@@ -25,7 +25,7 @@ mov  r0q, 3
 
 This is equivalent to the following C code:
 
-```
+```c
 int i = 3;
 while(i > 0) {
     // do something
@@ -35,7 +35,7 @@ while(i > 0) {
 
 This C code is a bit unnatural.  Usually a loop in C is written like this:
 
-```
+```c
 int i;
 for(i = 0; i < 3; i++) {
     // do something
@@ -44,7 +44,7 @@ for(i = 0; i < 3; i++) {
 
 This is equivalent to:
 
-```
+```assembly
 xor r0q, r0q
 .loop:
     inc r0q
@@ -72,7 +72,7 @@ Here are some common jump mnemonics you’ll end up using (*FLAGS* are there for
 
 Let’s look at some examples showing how to use constants:
 
-```
+```assembly
 SECTION_RODATA
 
 constants_1: db 1,2,3,4
@@ -91,7 +91,7 @@ Offsets are the distance (in bytes) between consecutive elements in memory. The 
 
 Now that we're able to write loops, it’s time to fetch data. But there are some differences compared to C. Let’s look at the following loop in C:
 
-```
+```c
 uint32_t data[3];
 int i;
 for(i = 0; i < 3; i++) {
@@ -103,7 +103,7 @@ The 4-byte offset between elements of data is precalculated by the C compiler. B
 
 Let’s look at the syntax for memory address calculations. This applies to all types of memory addresses:
 
-```
+```assembly
 [base + scale*index + disp]
 ```
 
@@ -116,7 +116,7 @@ x86asm provides the constant mmsize, which lets you know the size of the SIMD re
 
 Here’s a simple (and nonsensical) example to illustrate loading from custom offsets:
 
-```
+```assembly
 ;static void simple_loop(const uint8_t *src)
 INIT_XMM sse2
 cglobal simple_loop, 1, 2, 2, src
@@ -140,19 +140,19 @@ Note how in ```movu m1, [srcq+2*r1q+3+mmsize]``` the assembler will precalculate
 
 Now that you understand offsets you are able to use lea (Load Effective Address). This lets you perform multiplication and addition with one instruction, which is going to be faster than using multiple instructions. There are, of course, limitations on what you can multiply by and add to but this does not stop lea being a powerful instruction.
 
-```
+```assembly
 lea r0q, [base + scale*index + disp]
 ```
 
 Contrary to the name, LEA can be used for normal arithmetic as well as address calculations. You can do something as complicated as:
 
-```
+```assembly
 lea r0q, [r1q + 8*r2q + 5]
 ```
 
 Note that this does not affect the contents of r1q and r2q. It also doesn’t affect *FLAGS* (so you can’t jump based on the output). Using LEA avoids all these instructions and temporary registers (this code is not equivalent because add changes *FLAGS*):
 
-```
+```assembly
 movq r0q, r1q
 movq r3q, r2q
 sal  r3q, 3 ; shift arithmetic left 3 = * 8

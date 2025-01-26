@@ -99,7 +99,7 @@ You’ll see in many examples we include the file x86inc.asm. X86inc.asm is a li
 
 Let’s look at a simple (and very much artificial) snippet of scalar asm (assembly code that operates on individual data items, one at a time, within each instruction) to see what’s going on:
 
-```
+```assembly
 mov  r0q, 3  
 inc  r0q  
 dec  r0q  
@@ -114,7 +114,7 @@ Note that the human readable instructions such as mov and inc, which are assembl
 
 Here’s our first SIMD function:
 
-```
+```assembly
 %include "x86inc.asm"
 
 SECTION .text
@@ -134,26 +134,26 @@ cglobal add_values, 2, 2, 2, src, src2
 
 Let’s go through it line by line:
 
-```
+```assembly
 %include "x86inc.asm"
 ```
 
 This is a “header” developed in the x264, FFmpeg, and dav1d communities to provide helpers, predefined names and macros (such as cglobal below) to simplify writing assembly.
 
-```
+```assembly
 SECTION .text
 ```
 
 This denotes the section where the code you want to execute is placed. This is in contrast to the .data section, where you can put constant data.
 
-```
+```assembly
 ;static void add_values(const uint8_t *src, const uint8_t *src2);  
 INIT_XMM sse2
 ```
 
 The first line is a comment (the semi-colon “;” in asm is like “//” in C) showing what the function argument looks like in C. The second line shows how we are initialising the function to use XMM registers, using the sse2 instruction set. This is because paddb is an sse2 instruction. We’ll cover sse2 in more detail in the next lesson.
 
-```
+```assembly
 cglobal add_values, 2, 2, 2, src, src2
 ```
 
@@ -168,14 +168,16 @@ Let’s go through each item one at a time:
 
 It’s worth noting that older code may not have labels for the function arguments but instead address GPRs directly using r0, r1 etc.
 
+```assembly
     movu  m0, [srcq]  
     movu  m1, [src2q]
+```
 
 movu is shorthand for movdqu (move double quad unaligned). Alignment will be covered in another lesson but for now movu can be treated as a 128-bit move from [srcq]. In the case of mov, the brackets mean that the address in [srcq] is being dereferenced, the equivalent of **src in C.* This is what’s known as a load. Note that the “q” suffix refers to the size of the pointer *(*i.e in C it represents *sizeof(*src) == 8 on 64-bit systems, and x86asm is smart enough to use 32-bit on 32-bit systems) but the underlying load is 128-bit.
 
 Note that we don’t refer to vector registers by their full name, in this case xmm0,but as m0, an abstracted form. In future lessons you’ll see how this means you can write code once and have it work on multiple SIMD register sizes.
 
-```
+```assembly
 paddb m0, m1
 ```
 
@@ -194,13 +196,13 @@ paddb (read this in your head as *p-add-b*) is adding each byte in each register
 | a+q | b+r | c+s | d+t | e+u | f+v | g+w | h+x | i+y | j+z | k+aa | l+ab | m+ac | n+ad | o+ae | p+af |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 
-```
+```assembly
 movu  [srcq], m0
 ```
 
 This is what’s known as a store. The data is written back to the address in the srcq pointer.
 
-```
+```assembly
 RET
 ```
 

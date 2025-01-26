@@ -55,7 +55,7 @@ We use ptrdiff_t for the width variable instead of int to make sure that the upp
 
 The function below has the pointer offset trickery in it:
 
-```
+```assembly
 ;static void add_values(const uint8_t *src, const uint8_t *src2, ptrdiff_t width)
 INIT_XMM sse2
 cglobal add_values, 3, 3, 2, src, src2, width
@@ -78,7 +78,7 @@ cglobal add_values, 3, 3, 2, src, src2, width
 
 Let’s go through this step by step as it can be confusing:
 
-```
+```assembly
    add srcq, widthq
    add src2q, widthq
    neg widthq
@@ -86,14 +86,14 @@ Let’s go through this step by step as it can be confusing:
 
 The width is added to each pointer such that each pointer now points to the end of the buffer to be processed. The width is then negated.
 
-```
+```assembly
     movu  m0, [srcq+widthq]
     movu  m1, [src2q+widthq]
 ```
 
 The loads are then done with widthq being negative. So on the first iteration [srcq+widthq] points to the original address of srcq, i.e points back to the beginning of the buffer.
 
-```
+```assembly
     add   widthq, mmsize
     jl .loop
 ```
@@ -108,7 +108,7 @@ In FFmpeg, av_malloc is able to provide aligned memory on the heap and the DECLA
 
 Here is how to align the beginning of the RODATA section to 64-bytes:
 
-```
+```assembly
 SECTION_RODATA 64
 ```
 
@@ -135,7 +135,7 @@ You can see that bytes are interleaved from the lower half of each register resp
 
 Here is a snippet showing how this is done:
 
-```
+```assembly
 pxor      m2, m2 ; zero out m2
 
 movu      m0, [srcq]
@@ -152,7 +152,7 @@ Signed data is a bit more complicated. To range extend a signed integer, we need
 
 ```pcmpgtb``` (packed compare greater than byte) can be used for sign extension. By doing the comparison (0 > byte), all the bits in the destination byte are set to 1 if the byte is negative, otherwise the bits in the destination byte are set to 0. punpckX can be used as above to perform the sign extension. If the byte is negative the corresponding byte is 0b11111111 and otherwise it’s 0x00000000. Interleaving the byte value with the output of pcmpgtb performs a sign extension to word as a result.
 
-```
+```assembly
 pxor      m2, m2 ; zero out m2
 
 movu      m0, [srcq]
@@ -175,7 +175,7 @@ Shuffles, also known as permutes, are arguably the most important instruction in
 
 For each byte the corresponding source byte is used as an index of the destination register, except when the MSB is set the destination byte is zeroed. It’s analogous to the following C code (although in SIMD all 16 loop iterations happen in parallel):
 
-```
+```c
 for(int i = 0; i < 16; i++) {
     if(src[i] & 0x80)
         dst[i] = 0;
@@ -185,7 +185,7 @@ for(int i = 0; i < 16; i++) {
 ```
 Here’s a simple assembly example:
 
-```
+```assembly
 SECTION_DATA 64
 
 shuffle_mask: db 4, 3, 1, 2, -1, 2, 3, 7, 5, 4, 3, 8, 12, 13, 15, -1
