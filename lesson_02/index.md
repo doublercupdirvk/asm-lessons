@@ -164,3 +164,5 @@ add  r0q, r3q
 You’ll see lea used a lot to set up addresses before loops or perform calculations like the above. Note of course, that you can’t do all types of multiply and addition, but multiplications by 1, 2, 4, 8 and addition of a fixed offset is common.
 
 In the assignment you’ll have to load a constant and add the values to a SIMD vector in a loop.
+
+[Next Lesson](../lesson_03/index.md)
