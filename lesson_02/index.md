@@ -48,8 +48,8 @@ This is roughly equivalent to (there's no simple way of matching this ```for``` 
 ```assembly
 xor r0q, r0q
 .loop:
-    inc r0q
     ; do something
+    inc r0q
     cmp r0q, 3
     jl  .loop ; jump if (r0q - 3) < 0, i.e (r0q < 3)
 ```
