@@ -33,13 +33,13 @@ Enfin, vous verrez beaucou d'experts auto-proclamés sur Internet disant que rie
 
 **Les variétés d'assembleurs**
 
-Ces leçons se concentreront sur l'assembleur x86 64 bits. Aussi connu sous le nom d'amd64, bien qu'il continue de fonctionner sur les CPUs Inter. Il existe autant de types d'assembleurs que de CPUs comme ceux pour ARM ou RISC-V avec potentiellement des mises à jours de ces cours pour les inclures.
+Ces leçons se concentreront sur l'assembleur x86 64 bits. Aussi connu sous le nom d'amd64, bien qu'il continue de fonctionner sur les CPUs Intel. Il existe autant de types d'assembleurs que de CPUs comme ceux pour ARM ou RISC-V avec potentiellement des mises à jour de ces cours pour les inclure.
 
-Il existe deux types de syntaxes pour l'assembleur x86 que vous trouverez en ligne : AT&T et Inter. La première est plus ancienne et plus difficile à lire comparé à la seconde. Nous nous intéresserons à cette dernière.
+Il existe deux types de syntaxes pour l'assembleur x86 que vous trouverez en ligne : AT&T et Intel. La première est plus ancienne et plus difficile à lire comparé à la seconde. Nous nous intéresserons à cette dernière.
 
 **Matériels supportés**
 
-Vous serez peut-être surpris d'entendre que des livres ou des ressources en ligne comme Stack Overflow ne sont pas d'une grande aide comme références. Particulièrement à cause de notre choix d'utiliser de l'assembleur écrit à la main avec la syntaxe Inter. Mais aussi parce que beaucoup de ces ressources en ligne se concentrent sur de la programmation de système d'exploittions ou de la programmation pour du hardware, n'utilisant pas du code SIMD. L'assembleur de FFmpeg est majoritairement axé autout du traitement d'images haute performance, et comme vous le verrez, avec une approche particulière de la programmation en assembleur. Ceci étant dit, il est facile de comprendre d'autres cas d'utilisation de l'assembleur une fois ces leçons terminées.
+Vous serez peut-être surpris d'entendre que des livres ou des ressources en ligne comme Stack Overflow ne sont pas d'une grande aide comme références. Particulièrement à cause de notre choix d'utiliser de l'assembleur écrit à la main avec la syntaxe Intel. Mais aussi parce que beaucoup de ces ressources en ligne se concentrent sur de la programmation de systèmes d'exploitation ou de la programmation pour du hardware, n'utilisant pas du code SIMD. L'assembleur de FFmpeg est majoritairement axé autout du traitement d'images haute performance, et comme vous le verrez, avec une approche particulière de la programmation en assembleur. Ceci étant dit, il est facile de comprendre d'autres cas d'utilisation de l'assembleur une fois ces leçons terminées.
 
 Beaucoup de livres détaillent beaucoup différentes architectures d'ordinateur avant de détailler l'assembleur. De notre point de vue, c'est très bien si c'est ce que vous voulez apprendre, mais cela revient à vouloir étudier les moteurs avant d'apprendre à conduire une voiture.
 
@@ -50,11 +50,11 @@ Un serveur Discord est disponible pour répondre à vos questions:
 
 **Les registres**  
 
-Les registres sont des zones du CPU où les données peuvent être traitées. Les CPUs n'interviennent pas directement sur la mémoire, les données sont plutôt chargés dans des registres, traitées, puis écrites à nouveau en mémoire. En assembleur, de manière générale, vous ne pouvez pas coper directement les données d'un emplacement mémoire à un autre endroit sans d'aboder passer ces données dans un registre.
+Les registres sont des zones du CPU où les données peuvent être traitées. Les CPUs n'interviennent pas directement sur la mémoire, les données sont plutôt chargés dans des registres, traitées, puis écrites à nouveau en mémoire. En assembleur, de manière générale, vous ne pouvez pas copier directement les données d'un emplacement mémoire à un autre endroit sans d'abord passer ces données dans un registre.
 
 **Registres à usage général**
 
-Le premier type de registre que nous allons rencontrer est connu sous le nom de Registre à Usage Générale (GPR). Les GPR sont appelés ainsi car ils peuvent contenir soit des données, une valeur allant jusqu'à 64-bits, soit une adresse mémoire (un pointeur). Une valeur dans un GOR peut être traite par des opérations telles que l'addition, la multiplication, le décalage, etc...
+Le premier type de registre que nous allons rencontrer est connu sous le nom de Registre à Usage Générale (GPR). Les GPR sont appelés ainsi car ils peuvent contenir soit des données, une valeur allant jusqu'à 64-bits, soit une adresse mémoire (un pointeur). Une valeur dans un GPR peut être traitée par des opérations telles que l'addition, la multiplication, le décalage, etc...
 
 Dans la plupart des livres sur l'assembleur, de nombreux chapitres entiers sont concsacrés aux subtilités des GPR, leur histoire, etc... Car les GPR ont joués un rôle important dans la programmation de systèmes d'exploitation, le reverse engineering, etc... Dans l'assembleur écrit pour FFmpeg, les GPR sont considérés comme des échafaudages et la plupart du temps, leur compléxités ne sont pas nécessaires et sont abstraites.
 
@@ -97,7 +97,7 @@ Les caractères en gras seront important dans la suite.
 
 **Header x86inc.asm**  
 
-Dans beaucoup d'exemple, nous incluons le fichier x86inc.asm. x86inc.asm est une couche d'abstraction légère utilisée dans FFmpeg, x264 et dav1d pour faciliter la vie des développeurs. Elle aide de nombreuses manières, mais l'une des choses utiles qu'elle permet est entre autre d'étiquetter les GPR `r0`, `r1` et `r2`. Vous n'aurez pas à vous souvenir des noms des registres. Comme mentionné précédemment, les GPR sont généralement juste des échafaudages, donc cela rend les choses beaucoup plus simple.
+Dans beaucoup d'exemples, nous incluons le fichier x86inc.asm. x86inc.asm est une couche d'abstraction légère utilisée dans FFmpeg, x264 et dav1d pour faciliter la vie des développeurs. Elle aide de nombreuses manières, mais l'une des choses utiles qu'elle permet est entre autre d'étiquetter les GPR `r0`, `r1` et `r2`. Vous n'aurez pas à vous souvenir des noms des registres. Comme mentionné précédemment, les GPR sont généralement juste des échafaudages, donc cela rend les choses beaucoup plus simples.
 
 **Un extrait simple d'assembleur scalaire**
 
